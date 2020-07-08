@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	char c;
 
 	char mem[M_SIZE]; // 30k memory cells
-	int ptr = 0;
+	unsigned int ptr = 0;
 	for(int i=0;i<M_SIZE;i++)mem[i]=0;
 
 	// parse file
@@ -31,11 +31,13 @@ int main(int argc, char *argv[])
 		switch(c)
 		{
 			case '>':
-				ptr++;
+				ptr = ++ptr == M_SIZE ? 0 : ptr; // wraparound
+				printf("PTR:%d\n",ptr);
 			break;
 
 			case '<':
-				ptr--;
+				ptr = --ptr == -1 ? M_SIZE-1 : ptr; // wraparound
+				printf("PTR: %d\n",ptr);
 			break;
 
 			case '+':
