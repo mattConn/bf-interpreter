@@ -2,6 +2,20 @@
 
 #define M_SIZE 30000
 
+FILE *fp;
+char c;
+
+int findChar(int fn(FILE*), char cur, char target)
+{
+	do {
+		c = fn(fp);
+
+		if(feof(fp)) return -1;
+
+		if(c == cur) findChar(fn,cur,target);
+	} while (c != target);
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc < 2)
@@ -10,14 +24,13 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	FILE *fp=fopen(argv[1],"r");
+	fp=fopen(argv[1],"r");
 
 	if (!fp)
 	{
 		fprintf(stderr,"Could not open file '%s'.\n",argv[1]);
 		return 1;
 	}
-	char c;
 	int pos;
 
 	char mem[M_SIZE]; // 30k memory cells
