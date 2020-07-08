@@ -27,18 +27,17 @@ int main(int argc, char *argv[])
 	// parse file
 	do {
 		c = fgetc(fp);
+		//printf("%c:%d, ",c,ftell(fp));
 		if(feof(fp)) break;
 
 		switch(c)
 		{
 			case '>':
 				ptr = ++ptr == M_SIZE ? 0 : ptr; // wraparound
-				printf("PTR:%d\n",ptr);
 			break;
 
 			case '<':
-				ptr = --ptr == -1 ? M_SIZE-1 : ptr; // wraparound
-				printf("PTR: %d\n",ptr);
+				ptr = --ptr == -1 ? M_SIZE-1 : ptr;
 			break;
 
 			case '+':
@@ -58,17 +57,33 @@ int main(int argc, char *argv[])
 
 			case '[':
 				pos = ftell(fp);
-				if(!mem[ptr])
+				if(mem[ptr] == 0)
 				{
-					do {
+					while (c != ']')
+					{
 						c = fgetc(fp);
-						if(feof(fp)) break;
+						if(feof(fp)) 
+						{
+							fprintf(stderr,"Missing opening ']' at character %d.\n",ftell(fp));
+							return 1;
+						}
 					}
-					while (c != ']');
+					c = fgetc(fp);
 				}
 			break;
 
 			case ']':
+				if(pos < 0)
+				{
+					fprintf(stderr,"Missing opening '[' at character %d.\n",ftell(fp));
+					return 1;
+				}
+
+				if(mem[ptr] != 0)
+				{
+					fseek(fp,pos-1,SEEK_SET);
+					pos = -1;
+				}
 			break;
 
 		}
