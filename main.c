@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	char c;
+	int pos;
 
 	char mem[M_SIZE]; // 30k memory cells
 	unsigned int ptr = 0;
@@ -56,6 +57,15 @@ int main(int argc, char *argv[])
 			break;
 
 			case '[':
+				pos = ftell(fp);
+				if(!mem[ptr])
+				{
+					do {
+						c = fgetc(fp);
+						if(feof(fp)) break;
+					}
+					while (c != ']');
+				}
 			break;
 
 			case ']':
