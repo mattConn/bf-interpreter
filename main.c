@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 				{
 					if(fseek(fp, -2, SEEK_CUR) != 0) {fprintf(stderr, "Missing '['.\n"); return 1;}
 
-					c = getc(fp);
+					c = fgetc(fp);
 
 					if(feof(fp)) return 1;
 
