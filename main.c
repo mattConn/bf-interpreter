@@ -2,30 +2,9 @@
 
 #define M_SIZE 30000
 
-FILE *fp;
+FILE *fp, *ip;
 char c;
 
-int findCharFwd(char cur, char target)
-{
-	do {
-		c = fgetc(fp);
-
-		if(feof(fp)) return -1;
-
-		if(c == cur) findCharFwd(cur,target);
-	} while (c != target);
-}
-
-int findCharBwd(char cur, char target)
-{
-	do {
-		ungetc(c, fp);
-
-		if(feof(fp)) return -1;
-
-		if(c == cur) findCharBwd(cur,target);
-	} while (c != target);
-}
 
 int main(int argc, char *argv[])
 {
@@ -36,12 +15,23 @@ int main(int argc, char *argv[])
 	}
 
 	fp=fopen(argv[1],"r");
-
 	if (!fp)
 	{
 		fprintf(stderr,"Could not open file '%s'.\n",argv[1]);
 		return 1;
 	}
+
+	if(argc == 3) 
+	{
+		ip=fopen(argv[2],"r");
+		if (!ip)
+		{
+			fprintf(stderr,"Could not open input file '%s'.\n",argv[2]);
+			return 1;
+		}
+	}
+	else ip = NULL;
+
 	int pos;
 	int counter;
 
@@ -78,6 +68,11 @@ int main(int argc, char *argv[])
 			break;
 
 			case ',': // input
+				if(!ip){fprintf(stderr,"Missing input file.\n"); return 1;}
+
+				mem[ptr] = fgetc(ip);
+				if(feof(ip)){fprintf(stderr, "Input too short.\n"); return 1;}
+
 			break;
 
 			case '[': // jz to closing ]
@@ -116,6 +111,7 @@ int main(int argc, char *argv[])
 
 	printf("\n");
 	fclose(fp);
+	if(ip)fclose(ip);
 	
 	return 0;
 }
