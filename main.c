@@ -2,6 +2,31 @@
 
 #define M_SIZE 30000
 
+FILE *fp;
+char c;
+
+int findCharFwd(char cur, char target)
+{
+	do {
+		c = fgetc(fp);
+
+		if(feof(fp)) return -1;
+
+		if(c == cur) findCharFwd(cur,target);
+	} while (c != target);
+}
+
+int findCharBwd(char cur, char target)
+{
+	do {
+		ungetc(c, fp);
+
+		if(feof(fp)) return -1;
+
+		if(c == cur) findCharBwd(cur,target);
+	} while (c != target);
+}
+
 int main(int argc, char *argv[])
 {
 	if (argc < 2)
@@ -10,15 +35,15 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	FILE *fp=fopen(argv[1],"r");
+	fp=fopen(argv[1],"r");
 
 	if (!fp)
 	{
 		fprintf(stderr,"Could not open file '%s'.\n",argv[1]);
 		return 1;
 	}
-	char c;
 	int pos;
+	int counter;
 
 	char mem[M_SIZE]; // 30k memory cells
 	unsigned int ptr = 0;
@@ -32,11 +57,11 @@ int main(int argc, char *argv[])
 
 		switch(c)
 		{
-			case '>':
-				ptr = ++ptr == M_SIZE ? 0 : ptr; // wraparound
+			case '>': // inc mem ptr 
+				ptr = (++ptr)%M_SIZE; // wraparound
 			break;
 
-			case '<':
+			case '<': // dec mem ptr
 				ptr = --ptr == -1 ? M_SIZE-1 : ptr;
 			break;
 
@@ -48,41 +73,41 @@ int main(int argc, char *argv[])
 				mem[ptr]--;
 			break;
 
-			case '.':
+			case '.': // output
 				printf("%c",mem[ptr]);
 			break;
 
-			case ',':
+			case ',': // input
 			break;
 
-			case '[':
-				pos = ftell(fp);
-				if(mem[ptr] == 0)
+			case '[': // jz to closing ]
+				if(mem[ptr] != 0) break; 
+
+				counter = 1;
+				while(counter != 0)
 				{
-					while (c != ']')
-					{
-						c = fgetc(fp);
-						if(feof(fp)) 
-						{
-							fprintf(stderr,"Missing opening ']' at character %d.\n",ftell(fp));
-							return 1;
-						}
-					}
 					c = fgetc(fp);
+					if(feof(fp)) {fprintf(stderr, "Missing ']'.\n"); return 1;}
+
+					if(c == '[') counter++;
+					if(c == ']') counter--;
 				}
 			break;
 
-			case ']':
-				if(pos < 0)
-				{
-					fprintf(stderr,"Missing opening '[' at character %d.\n",ftell(fp));
-					return 1;
-				}
+			case ']': // jnz to opening [
+				if(mem[ptr] == 0) break; 
 
-				if(mem[ptr] != 0)
+				counter = 1;
+				while(counter != 0)
 				{
-					fseek(fp,pos-1,SEEK_SET);
-					pos = -1;
+					if(fseek(fp, -2, SEEK_CUR) != 0) {fprintf(stderr, "Missing '['.\n"); return 1;}
+
+					c = getc(fp);
+
+					if(feof(fp)) return 1;
+
+					if(c == '['){ counter--;}
+					if(c == ']'){ counter++;}
 				}
 			break;
 
