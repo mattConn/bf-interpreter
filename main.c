@@ -1,3 +1,17 @@
+/*
+Matt's Brain**** Interpreter
+
+Usage:
+------
+./bf bfCode.b optionalInput
+
+Info:
+-----
+Mem: 30k 8bit char cells with wraparound.
+Input files: EOF == -1 and is stored.
+
+*/
+
 #include <stdio.h>
 
 #define M_SIZE 30000
@@ -10,7 +24,7 @@ int main(int argc, char *argv[])
 {
 	if (argc < 2) // missing bf file
 	{
-		fprintf(stderr,"File not specified.\n");
+		fprintf(stderr,"Specify .b file and optional input file.\n");
 		return 1;
 	}
 	fp=fopen(argv[1],"r");
@@ -40,7 +54,7 @@ int main(int argc, char *argv[])
 
 	// parse file
 	do {
-		c = fgetc(fp); // newline appears before EOF
+		c = fgetc(fp);
 		if(feof(fp)) break;
 
 		switch(c)
@@ -65,12 +79,10 @@ int main(int argc, char *argv[])
 				printf("%c",mem[ptr]);
 			break;
 
-			case ',': // input
+			case ',': // input, does not handle EOF
 				if(!ip){fprintf(stderr,"Missing input file.\n"); return 1;}
 
 				mem[ptr] = fgetc(ip);
-				if(feof(ip)){fprintf(stderr, "Input too short.\n"); return 1;}
-
 			break;
 
 			case '[': // jump when zero after closing ]
