@@ -2,18 +2,17 @@
 
 #define M_SIZE 30000
 
-FILE *fp, *ip;
-char c;
+FILE *fp, *ip; // bf file, input file
+char c; // fgetc
 
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2)
+	if (argc < 2) // missing bf file
 	{
 		fprintf(stderr,"File not specified.\n");
 		return 1;
 	}
-
 	fp=fopen(argv[1],"r");
 	if (!fp)
 	{
@@ -21,7 +20,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if(argc == 3) 
+	if(argc == 3) // input file
 	{
 		ip=fopen(argv[2],"r");
 		if (!ip)
@@ -30,19 +29,18 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 	}
-	else ip = NULL;
+	else ip = NULL; // no input
 
-	int pos;
-	int counter;
+	int counter; // brace counter for jumps
 
 	char mem[M_SIZE]; // 30k memory cells
-	unsigned int ptr = 0;
-	for(int i=0;i<M_SIZE;i++)mem[i]=0;
+	for(int i=0;i<M_SIZE;i++)mem[i]=0; 
+
+	unsigned int ptr = 0; // mem ptr
 
 	// parse file
 	do {
-		c = fgetc(fp);
-		//printf("%c:%d, ",c,ftell(fp));
+		c = fgetc(fp); // newline appears before EOF
 		if(feof(fp)) break;
 
 		switch(c)
@@ -75,11 +73,11 @@ int main(int argc, char *argv[])
 
 			break;
 
-			case '[': // jz to closing ]
+			case '[': // jump when zero after closing ]
 				if(mem[ptr] != 0) break; 
 
 				counter = 1;
-				while(counter != 0)
+				while(counter != 0) // find closing bracket
 				{
 					c = fgetc(fp);
 					if(feof(fp)) {fprintf(stderr, "Missing ']'.\n"); return 1;}
@@ -89,7 +87,7 @@ int main(int argc, char *argv[])
 				}
 			break;
 
-			case ']': // jnz to opening [
+			case ']': // jump when nonzero to opening [
 				if(mem[ptr] == 0) break; 
 
 				counter = 1;
