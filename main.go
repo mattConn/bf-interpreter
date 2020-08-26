@@ -81,7 +81,6 @@ func main() {
 			bracketCount = 1
 
 			for bracketCount != 0 {
-				// _, err = fp.Read(buf)
 				fp.Seek(-2, 1)
 
 				if err != nil {
